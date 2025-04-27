@@ -1,7 +1,7 @@
 from sqlmodel import Field, SQLModel 
 from pydantic import EmailStr, HttpUrl
 
-from .security import generate_hashed_password
+from app.core.security import generate_hashed_password
 
 
 class User(SQLModel, table=True):

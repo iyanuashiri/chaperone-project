@@ -11,8 +11,8 @@ from sqlmodel import Session
 
 from . import models
 from . import schemas
-from .database import create_db_and_tables, get_session
-from .security import generate_hashed_password, verify_hashed_password, manager, OAuth2PasswordNewRequestForm
+from app.core.database import create_db_and_tables, get_session
+from app.core.security import generate_hashed_password, verify_hashed_password, manager, OAuth2PasswordNewRequestForm
 # from .prompts import process_article
 
 
