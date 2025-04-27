@@ -10,6 +10,7 @@ from fastapi.responses import HTMLResponse
 from sqlmodel import Session
 
 from . import models
+from . import schemas
 from .database import create_db_and_tables, get_session
 from .security import generate_hashed_password, verify_hashed_password, manager, OAuth2PasswordNewRequestForm
 # from .prompts import process_article
@@ -36,7 +37,7 @@ def on_startup():
 
 
 @app.post("/login/", status_code=status.HTTP_200_OK)
-def login(session: SessionDep, data: OAuth2PasswordNewRequestForm = Depends()):
+async def login(session: SessionDep, data: OAuth2PasswordNewRequestForm = Depends()):
     email = data.email
     password = data.password
 
@@ -53,8 +54,8 @@ def login(session: SessionDep, data: OAuth2PasswordNewRequestForm = Depends()):
     return {"access_token": access_token, "email": email}
     
     
-@app.post("/users/", status_code=status.HTTP_201_CREATED, response_model=models.UserPublic)
-def create_user(user: models.UserCreate, session: SessionDep) -> models.User:
+@app.post("/users/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserBase)
+async def create_user(user: models.User, session: SessionDep) -> models.User:
     db_user = models.User.model_validate(user)
     db_user.password = generate_hashed_password(raw_password=user.password)
     session.add(db_user)
@@ -63,14 +64,14 @@ def create_user(user: models.UserCreate, session: SessionDep) -> models.User:
     return db_user  
 
 
-@app.get("/users/", response_model=list[models.UserPublic])
-def get_users(session: SessionDep) -> list[models.User]:
+@app.get("/users/", response_model=list[schemas.UserBase])
+async def get_users(session: SessionDep) -> list[models.User]:
     users = session.query(models.User).all()
     return users
     
     
-@app.get("/users/{user_id}/", response_model=models.UserPublic)
-def get_users(user_id: int, session: SessionDep) -> models.User:
+@app.get("/users/{user_id}/", response_model=schemas.UserBase)
+async def get_users(user_id: int, session: SessionDep) -> models.User:
     user = session.get(models.User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
