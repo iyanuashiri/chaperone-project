@@ -77,3 +77,26 @@ async def get_users(user_id: int, session: SessionDep) -> models.User:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
+@app.post("/vocabularies/", status_code=status.HTTP_201_CREATED, response_model=schemas.VocabularyRead)
+async def create_vocabulary(vocab: schemas.VocabularyCreate, session: SessionDep) -> models.Vocabulary:
+    db_vocab = models.Vocabulary(word=vocab.word, meaning=vocab.meaning)
+    session.add(db_vocab)
+    session.commit()
+    session.refresh(db_vocab)
+    return db_vocab
+
+
+@app.get("/vocabularies/", response_model=list[schemas.VocabularyRead])
+async def get_vocabulary(session: SessionDep) -> list[models.Vocabulary]:
+    vocabularies = session.query(models.Vocabulary).all()
+    return vocabularies
+
+
+@app.get("/vocabularies/{vocab_id}/", response_model=schemas.VocabularyRead)
+async def get_vocabulary_by_id(vocab_id: int, session: SessionDep) -> models.Vocabulary:
+    vocab = session.get(models.Vocabulary, vocab_id)
+    if not vocab:
+        raise HTTPException(status_code=404, detail="Vocabulary not found")
+    return vocab
+
