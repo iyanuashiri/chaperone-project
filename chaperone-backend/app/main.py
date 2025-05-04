@@ -1,19 +1,14 @@
 from typing import Annotated
 from datetime import timedelta
-import os
 
-from fastapi import FastAPI, Depends, status, HTTPException, Form, Request
+from fastapi import FastAPI, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
 from sqlmodel import Session
 
 from . import models
 from . import schemas
 from app.core.database import create_db_and_tables, get_session
 from app.core.security import generate_hashed_password, verify_hashed_password, manager, OAuth2PasswordNewRequestForm
-# from .prompts import process_article
 
 
 SessionDep = Annotated[Session, Depends(get_session)] 
@@ -23,12 +18,11 @@ app = FastAPI()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-script_dir = os.path.dirname(__file__)
-st_abs_file_path = os.path.join(script_dir, "static/")
-os.makedirs(st_abs_file_path, exist_ok=True)
-app.mount("/static", StaticFiles(directory=st_abs_file_path), name="static")
 
-templates = Jinja2Templates(directory="app/templates")
+@manager.user_loader()
+async def get_user(email: str = None):
+    session = next(get_session())
+    return session.query(models.User).filter(models.User.email == email).first()
 
 
 @app.on_event("startup")
@@ -51,11 +45,14 @@ async def login(session: SessionDep, data: OAuth2PasswordNewRequestForm = Depend
                             headers={"WWW-Authenticate": "Bearer"})
 
     access_token = manager.create_access_token(data={"sub": email}, expires=timedelta(hours=12))
-    return {"access_token": access_token, "email": email}
+    return {"access_token": access_token, "token_type": "bearer", "email": email}
     
     
 @app.post("/users/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserBase)
 async def create_user(user: models.User, session: SessionDep) -> models.User:
+    existing_user = session.query(models.User).filter(models.User.email == user.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
     db_user = models.User.model_validate(user)
     db_user.password = generate_hashed_password(raw_password=user.password)
     session.add(db_user)
@@ -65,7 +62,7 @@ async def create_user(user: models.User, session: SessionDep) -> models.User:
 
 
 @app.get("/users/", response_model=list[schemas.UserBase])
-async def get_users(session: SessionDep) -> list[models.User]:
+async def get_users(session: SessionDep, ) -> list[models.User]:
     users = session.query(models.User).all()
     return users
     
@@ -79,7 +76,12 @@ async def get_users(user_id: int, session: SessionDep) -> models.User:
 
 
 @app.post("/vocabularies/", status_code=status.HTTP_201_CREATED, response_model=schemas.VocabularyRead)
-async def create_vocabulary(vocab: schemas.VocabularyCreate, session: SessionDep) -> models.Vocabulary:
+async def create_vocabulary(vocab: schemas.VocabularyCreate, session: SessionDep, current_user: models.User = Depends(manager)) -> models.Vocabulary:
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    if not current_user.is_active:
+        raise HTTPException(status_code=403, detail="Inactive user")
+
     db_vocab = models.Vocabulary(word=vocab.word, meaning=vocab.meaning)
     session.add(db_vocab)
     session.commit()
@@ -88,13 +90,22 @@ async def create_vocabulary(vocab: schemas.VocabularyCreate, session: SessionDep
 
 
 @app.get("/vocabularies/", response_model=list[schemas.VocabularyRead])
-async def get_vocabulary(session: SessionDep) -> list[models.Vocabulary]:
+async def get_vocabularies(session: SessionDep, current_user: models.User = Depends(manager)) -> list[models.Vocabulary]:
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    if not current_user.is_active:
+        raise HTTPException(status_code=403, detail="Inactive user")
     vocabularies = session.query(models.Vocabulary).all()
     return vocabularies
 
 
 @app.get("/vocabularies/{vocab_id}/", response_model=schemas.VocabularyRead)
-async def get_vocabulary_by_id(vocab_id: int, session: SessionDep) -> models.Vocabulary:
+async def get_vocabulary_by_id(vocab_id: int, session: SessionDep, current_user: models.User = Depends(manager)) -> models.Vocabulary:
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    if not current_user.is_active:
+        raise HTTPException(status_code=403, detail="Inactive user")
+        
     vocab = session.get(models.Vocabulary, vocab_id)
     if not vocab:
         raise HTTPException(status_code=404, detail="Vocabulary not found")
