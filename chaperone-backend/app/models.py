@@ -10,7 +10,7 @@ class User(SQLModel, table=True):
     last_name: str
     email: EmailStr = Field(max_length=255, index=True, unique=True)
     password: str  
-    is_acive: bool = Field(default=True)
+    is_active: bool = Field(default=True)
     is_superuser: bool = Field(default=False)
 
     associations: list["Association"] = Relationship(back_populates="user")
