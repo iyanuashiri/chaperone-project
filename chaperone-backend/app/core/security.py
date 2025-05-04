@@ -12,8 +12,11 @@ from decouple import config
 from passlib.hash import pbkdf2_sha256
 
 
+class NotAuthenticatedException(Exception):
+    pass
+
 SECRET = config("SECRET_KEY") 
-manager = LoginManager(SECRET, "/login")
+manager = LoginManager(SECRET, token_url="/login", use_header=True, not_authenticated_exception=NotAuthenticatedException)
 pwd_context = CryptContext(schemes=["bcrypt"])
 
 
