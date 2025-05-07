@@ -9,6 +9,7 @@ from . import models
 from . import schemas
 from app.core.database import create_db_and_tables, get_session
 from app.core.security import generate_hashed_password, verify_hashed_password, manager, OAuth2PasswordNewRequestForm
+from app.prompts import generate_associations
 
 
 SessionDep = Annotated[Session, Depends(get_session)] 
@@ -111,3 +112,35 @@ async def get_vocabulary_by_id(vocab_id: int, session: SessionDep, current_user:
         raise HTTPException(status_code=404, detail="Vocabulary not found")
     return vocab
 
+
+@app.post("/associations/", status_code=status.HTTP_201_CREATED, response_model=schemas.AssociationRead)
+async def create_association(association: schemas.AssociationCreate, session: SessionDep, current_user: models.User = Depends(manager)) -> models.Association:
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    if not current_user.is_active:
+        raise HTTPException(status_code=403, detail="Inactive user")
+
+    vocab = session.get(models.Vocabulary, association.vocabulary_id)
+    if not vocab:
+        raise HTTPException(status_code=404, detail="Vocabulary not found")
+
+    generated_associations = await generate_associations(vocabulary=vocab.word, number_of_options=3)
+    generated_associations = generated_associations[0]
+    print(generated_associations)
+
+    db_association = models.Association(user_id=current_user.id, vocabulary_id=vocab.id)
+    session.add(db_association)
+    session.commit()
+    session.refresh(db_association)
+    
+    for option, meaning in generated_associations['options'].items():
+        if option.isupper():
+            is_correct = True
+        else:
+            is_correct = False
+        db_option = models.Option(option=option, meaning=meaning, is_correct=is_correct, association_id=db_association.id)
+        session.add(db_option)
+        session.commit()
+        session.refresh(db_option)
+
+    return db_association

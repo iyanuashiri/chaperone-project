@@ -39,7 +39,7 @@ async def generate_associations(vocabulary, number_of_options):
         input_variables=["vocabulary", "number_of_options"],
         partial_variables={"format_instructions": generated_associations_format_instructions})
 
-    llm = ChatGoogleGenerativeAI(google_api_key=config("GEMINI_API_KEY"), temperature=0.0, model='gemini-2.5-flash-preview-04-17')
+    llm = ChatGoogleGenerativeAI(google_api_key=config("GEMINI_API_KEY"), temperature=0.5, model='gemini-2.5-flash-preview-04-17')
 
     generated_associations = generate_associations_prompt | llm | generated_associations_output_parser
 
