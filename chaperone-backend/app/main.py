@@ -144,3 +144,29 @@ async def create_association(association: schemas.AssociationCreate, session: Se
         session.refresh(db_option)
 
     return db_association
+
+
+@app.get("/associations/", response_model=list[schemas.AssociationRead])
+async def get_associations(session: SessionDep, current_user: models.User = Depends(manager)):
+    """Get all associations for the current user"""
+    associations = session.query(models.Association).filter(
+        models.Association.user_id == current_user.id
+    ).all()
+    return associations
+
+
+@app.get("/associations/{association_id}", response_model=schemas.AssociationRead)
+async def get_association(association_id: int, session: SessionDep, current_user: models.User = Depends(manager)):
+    """Get a specific association by ID"""
+    association = session.query(models.Association).filter(
+        models.Association.id == association_id,
+        models.Association.user_id == current_user.id
+    ).first()
+    
+    if not association:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Association not found"
+        )
+    
+    return association
