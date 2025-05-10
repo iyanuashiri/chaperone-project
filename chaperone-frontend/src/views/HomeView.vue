@@ -149,24 +149,34 @@
       <section id="download" class="py-20 gradient-bg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white">Ready to Transform Your Browsing Experience?</h2>
-          <p class="text-xl text-white opacity-90 max-w-3xl mx-auto mb-10">Download Chaperone today and start building your vocabulary while improving your digital wellbeing.</p>
+          <!-- <p class="text-xl text-white opacity-90 max-w-3xl mx-auto mb-10">Download Chaperone today and start building your vocabulary while improving your digital wellbeing.</p> -->
           
+          <p class="text-xl text-white opacity-90 max-w-3xl mx-auto mb-10">Be first to experience Chaperone by joining the waitlist now to get early access and shape the future of mindful tech.</p>
+
           <div class="flex flex-col sm:flex-row justify-center gap-6">
-            <a href="#" class="bg-white text-purple-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors duration-300 flex items-center justify-center">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScvq89bz1m1U6skCWIWmn-spot7xKGvNpqW8dEv8I0hV8-uzw/viewform?usp=header" class="bg-white text-purple-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors duration-300 flex items-center justify-center">
+              <i class="fab fa-chrome text-2xl mr-3"></i>
+              <div class="text-left">
+                <div class="text-sm">Join the waitlist now</div>
+                <!-- <div class="font-semibold">Chrome</div> -->
+              </div>
+            </a>
+
+            <!-- <a href="#" class="bg-white text-purple-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors duration-300 flex items-center justify-center">
               <i class="fab fa-chrome text-2xl mr-3"></i>
               <div class="text-left">
                 <div class="text-sm">Add to</div>
                 <div class="font-semibold">Chrome</div>
               </div>
-            </a>
+            </a> -->
             
-            <a href="#" class="bg-white text-purple-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors duration-300 flex items-center justify-center">
+            <!-- <a href="#" class="bg-white text-purple-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors duration-300 flex items-center justify-center">
               <i class="fas fa-globe text-2xl mr-3"></i>
               <div class="text-left">
                 <div class="text-sm">Use</div>
                 <div class="font-semibold">Web App</div>
               </div>
-            </a>
+            </a> -->
           </div>
         </div>
       </section>
