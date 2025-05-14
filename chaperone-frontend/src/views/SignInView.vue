@@ -37,7 +37,7 @@
         localStorage.setItem('authToken', response.data.auth_token)
         localStorage.setItem('email', this.model.email)
         alert('You have logged in successfully')
-        this.$router.push({ name: 'shelf-list' })
+        this.$router.push({ name: 'dashboard' })
       })
         .catch(error => {
           console.log(error)
