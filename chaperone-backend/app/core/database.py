@@ -1,4 +1,7 @@
-from sqlmodel import create_engine, Session, SQLModel
+# from sqlmodel import create_engine, Session, SQLModel
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+from app.models import Base
 
 from decouple import config
 
@@ -11,7 +14,7 @@ engine = create_engine(sqlite_url, echo=True)
 
 
 def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+    Base.metadata.create_all(engine)
     
     
 def get_session():

@@ -1,11 +1,23 @@
 from typing import Dict, List
 from pydantic import BaseModel, Field
+from app.models import AssociationStatus
 
 
 class UserBase(BaseModel):
     first_name: str
     last_name: str
     email: str
+    
+
+class UserCreate(UserBase):
+    password: str
+
+
+class UserRead(UserBase):
+    id: int
+
+    class Config:
+        from_attributes = True
 
 
 class VocabularyCreate(BaseModel):
@@ -33,6 +45,7 @@ class AssociationCreate(BaseModel):
 
 class AssociationRead(BaseModel):
     id: int
+    status: AssociationStatus
     user: UserBase
     vocabulary: VocabularyRead
     options: List[OptionBase]

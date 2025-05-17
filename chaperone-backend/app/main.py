@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from fastapi import FastAPI, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from . import models
 from . import schemas
@@ -49,27 +49,27 @@ async def login(session: SessionDep, data: OAuth2PasswordNewRequestForm = Depend
     return {"access_token": access_token, "token_type": "bearer", "email": email}
     
     
-@app.post("/users/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserBase)
-async def create_user(user: models.User, session: SessionDep) -> models.User:
+@app.post("/users/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserRead)
+async def create_user(user: schemas.UserCreate, session: SessionDep) -> schemas.UserRead:
     existing_user = session.query(models.User).filter(models.User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    db_user = models.User.model_validate(user)
-    db_user.password = generate_hashed_password(raw_password=user.password)
+    db_user = models.User(first_name=user.first_name, last_name=user.last_name, email=user.email, password=user.password)
+    db_user.set_password(user.password)
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
     return db_user  
 
 
-@app.get("/users/", response_model=list[schemas.UserBase])
-async def get_users(session: SessionDep, ) -> list[models.User]:
+@app.get("/users/", response_model=list[schemas.UserRead])
+async def get_users(session: SessionDep, ) -> list[schemas.UserRead]:
     users = session.query(models.User).all()
     return users
     
     
-@app.get("/users/{user_id}/", response_model=schemas.UserBase)
-async def get_users(user_id: int, session: SessionDep) -> models.User:
+@app.get("/users/{user_id}/", response_model=schemas.UserRead)
+async def get_users(user_id: int, session: SessionDep) -> schemas.UserRead:
     user = session.get(models.User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -77,7 +77,7 @@ async def get_users(user_id: int, session: SessionDep) -> models.User:
 
 
 @app.post("/vocabularies/", status_code=status.HTTP_201_CREATED, response_model=schemas.VocabularyRead)
-async def create_vocabulary(vocab: schemas.VocabularyCreate, session: SessionDep, current_user: models.User = Depends(manager)) -> models.Vocabulary:
+async def create_vocabulary(vocab: schemas.VocabularyCreate, session: SessionDep, current_user: models.User = Depends(manager)) -> schemas.VocabularyRead:
     if not current_user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     if not current_user.is_active:
@@ -91,7 +91,7 @@ async def create_vocabulary(vocab: schemas.VocabularyCreate, session: SessionDep
 
 
 @app.get("/vocabularies/", response_model=list[schemas.VocabularyRead])
-async def get_vocabularies(session: SessionDep, current_user: models.User = Depends(manager)) -> list[models.Vocabulary]:
+async def get_vocabularies(session: SessionDep, current_user: models.User = Depends(manager)) -> list[schemas.VocabularyRead]:
     if not current_user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     if not current_user.is_active:
@@ -101,7 +101,7 @@ async def get_vocabularies(session: SessionDep, current_user: models.User = Depe
 
 
 @app.get("/vocabularies/{vocab_id}/", response_model=schemas.VocabularyRead)
-async def get_vocabulary_by_id(vocab_id: int, session: SessionDep, current_user: models.User = Depends(manager)) -> models.Vocabulary:
+async def get_vocabulary_by_id(vocab_id: int, session: SessionDep, current_user: models.User = Depends(manager)) -> schemas.VocabularyRead:
     if not current_user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     if not current_user.is_active:
@@ -114,7 +114,7 @@ async def get_vocabulary_by_id(vocab_id: int, session: SessionDep, current_user:
 
 
 @app.post("/associations/", status_code=status.HTTP_201_CREATED, response_model=schemas.AssociationRead)
-async def create_association(association: schemas.AssociationCreate, session: SessionDep, current_user: models.User = Depends(manager)) -> models.Association:
+async def create_association(association: schemas.AssociationCreate, session: SessionDep, current_user: models.User = Depends(manager)) -> schemas.AssociationRead:
     if not current_user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     if not current_user.is_active:
@@ -147,7 +147,7 @@ async def create_association(association: schemas.AssociationCreate, session: Se
 
 
 @app.get("/associations/", response_model=list[schemas.AssociationRead])
-async def get_associations(session: SessionDep, current_user: models.User = Depends(manager)):
+async def get_associations(session: SessionDep, current_user: models.User = Depends(manager)) -> list[schemas.AssociationRead]:
     """Get all associations for the current user"""
     associations = session.query(models.Association).filter(
         models.Association.user_id == current_user.id
@@ -156,7 +156,7 @@ async def get_associations(session: SessionDep, current_user: models.User = Depe
 
 
 @app.get("/associations/{association_id}", response_model=schemas.AssociationRead)
-async def get_association(association_id: int, session: SessionDep, current_user: models.User = Depends(manager)):
+async def get_association(association_id: int, session: SessionDep, current_user: models.User = Depends(manager)) -> schemas.AssociationRead:
     """Get a specific association by ID"""
     association = session.query(models.Association).filter(
         models.Association.id == association_id,
@@ -168,5 +168,49 @@ async def get_association(association_id: int, session: SessionDep, current_user
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Association not found"
         )
+    
+    return association
+
+
+@app.put("/associations/{association_id}/correct", response_model=schemas.AssociationRead)
+async def update_association(association_id: int, session: SessionDep, current_user: models.User = Depends(manager)) -> schemas.AssociationRead:
+    """Update a specific association by ID"""
+    association = session.query(models.Association).filter(
+        models.Association.id == association_id,
+        models.Association.user_id == current_user.id
+    ).first()
+    
+    if not association:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Association not found"
+        )
+    
+    association.correct_option()
+    session.add(association)
+    session.commit()
+    session.refresh(association)
+    
+    return association
+
+
+@app.put("/associations/{association_id}/incorrect", response_model=schemas.AssociationRead)
+async def update_association(association_id: int, session: SessionDep, current_user: models.User = Depends(manager)) -> schemas.AssociationRead:
+    """Update a specific association by ID"""
+    association = session.query(models.Association).filter(
+        models.Association.id == association_id,
+        models.Association.user_id == current_user.id
+    ).first()
+    
+    if not association:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Association not found"
+        )
+    
+    association.incorrect_option()
+    session.add(association)
+    session.commit()
+    session.refresh(association)
     
     return association
