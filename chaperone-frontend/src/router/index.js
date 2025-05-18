@@ -4,7 +4,7 @@ import SignUpView from '../views/SignUpView.vue'
 import HomeView from '../views/HomeView.vue'
 // import DashboardView from '../views/Dashboard.vue'
 import GameListView from '../views/GameList.vue'
-// import AssociationListView from '../views/AssociationList.vue'
+import AssociationListView from '../views/AssociationList.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,11 +34,11 @@ const router = createRouter({
       name: 'game-list',
       component: GameListView,
     },
-    // {
-    //   path: '/association-list',
-    //   name: 'association-list',
-    //   component: AssociationListView,
-    // },
+    {
+      path: '/association-list',
+      name: 'association-list',
+      component: AssociationListView,
+    },
     
     
     // {
