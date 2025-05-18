@@ -32,12 +32,19 @@
   },
   methods: {
     signIn: async function () {
-      let url = 'http://127.0.0.1:8000/api/v1/auth/token/login/'
-      axios.post(url, this.model).then(response => {
-        localStorage.setItem('authToken', response.data.auth_token)
+      let url = 'http://127.0.0.1:8000/login/'
+      const formData = new FormData()
+      formData.append('email', this.model.email)
+      formData.append('password', this.model.password)
+      axios.post(url, formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(response => {
+        localStorage.setItem('accessToken', response.data.access_token)
         localStorage.setItem('email', this.model.email)
         alert('You have logged in successfully')
-        this.$router.push({ name: 'dashboard' })
+        this.$router.push({ name: 'game-list' })
       })
         .catch(error => {
           console.log(error)
