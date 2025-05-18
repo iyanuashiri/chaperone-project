@@ -34,9 +34,11 @@ class VocabularyRead(BaseModel):
 
 
 class OptionBase(BaseModel):
+    id: int
     option: str
     meaning: str
     is_correct: bool
+    association_id: int
 
 
 class AssociationCreate(BaseModel):
@@ -49,6 +51,9 @@ class AssociationRead(BaseModel):
     user: UserBase
     vocabulary: VocabularyRead
     options: List[OptionBase]
+    number_of_times_played: int
+    number_of_times_correct: int
+    number_of_times_incorrect: int
 
     class Config:
         from_attributes = True

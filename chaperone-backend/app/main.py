@@ -163,7 +163,9 @@ async def create_association(association: schemas.AssociationCreate, session: Se
 @app.get("/associations/", response_model=list[schemas.AssociationRead])
 async def get_associations(session: SessionDep, current_user: models.User = Depends(manager)) -> list[schemas.AssociationRead]:
     """Get all associations for the current user"""
-    associations = session.query(models.Association).filter(
+    associations = session.query(models.Association).order_by(
+        models.Association.id.desc()
+    ).filter(
         models.Association.user_id == current_user.id
     ).all()
     return associations
