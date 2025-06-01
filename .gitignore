@@ -108,3 +108,4 @@ dist
 ../test.db
 chaperone-web/test.db   
 chaperone-backend/chaperone.db
+backend/chaperone.db
