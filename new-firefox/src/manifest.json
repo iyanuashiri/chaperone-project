@@ -1,0 +1,56 @@
+{
+  "{{chrome}}.manifest_version": 3,
+  "{{firefox}}.manifest_version": 2,
+  "name": "Chaperone",
+  "version": "2.0.0",
+  "description": "A customizable tool to manage your time on specific websites with a math challenge.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "<all_urls>",
+    "webNavigation"
+  ],
+  "background": {
+    "{{chrome}}.service_worker": "src/background.js",
+    "{{firefox}}.scripts": ["src/background.js"], 
+    "{{firefox}}.persistent": false
+  },
+  "{{firefox}}.browser_action": {
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "32": "src/icon/icon-with-shadow.svg"
+    },
+    "default_title": "Chaperone"
+  },
+  "{{chrome}}.action": {
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "32": "src/icon/icon-with-shadow.svg"
+    },
+    "default_title": "Chaperone"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content_scripts.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "options_page": "src/options.html",
+  "browser_specific_settings": {
+      "gecko": {
+          "id": "chaperone@yourdomain.com"
+      }
+  },
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "icons": {
+    "16": "src/icon/16.png",
+    "32": "src/icon/32.png",
+    "48": "src/icon/48.png",
+    "96": "src/icon/96.png",
+    "128": "src/icon/128.png"
+  }
+}
