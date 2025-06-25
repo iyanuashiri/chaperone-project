@@ -1,7 +1,8 @@
 from typing import List
+from datetime import datetime
 import enum
 
-from sqlalchemy import Integer, String, Boolean
+from sqlalchemy import Integer, String, Boolean, DateTime
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import mapped_column, Mapped, Relationship
 from sqlalchemy import Enum 
@@ -26,6 +27,7 @@ class User(Base):
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
 
     associations: Mapped[List["Association"]] = Relationship(back_populates="user", cascade="all, delete-orphan")
+    urls: Mapped[List["URL"]] = Relationship(back_populates="user", cascade="all, delete-orphan")
    
     def set_password(self, raw_password):
         self.password = generate_hashed_password(raw_password=raw_password)
@@ -85,3 +87,17 @@ class Option(Base):
 
     association_id: Mapped[int] = mapped_column(Integer, ForeignKey("association.id"))
     association: Mapped["Association"] = Relationship(back_populates="options")
+
+
+class URL(Base):
+    __tablename__ = "url"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    url: Mapped[str] = mapped_column(String(255))
+    title: Mapped[str] = mapped_column(String(255))
+    description: Mapped[str] = mapped_column(String(255))
+    date_added: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
+
+    # Relationship
+    user: Mapped["User"] = Relationship(back_populates="urls")    
