@@ -26,3 +26,7 @@
 4. `docker run --env-file .env -p 8000:8000 chaperone-backend`
 
 
+## Run migrations
+1. `uv run alembic init alembic`
+2. `uv run alembic revision --autogenerate -m "message"`
+3. `uv run alembic upgrade head`
