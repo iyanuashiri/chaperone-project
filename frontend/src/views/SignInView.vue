@@ -32,7 +32,7 @@
   },
   methods: {
     signIn: async function () {
-      let url = 'http://127.0.0.1:8000/login/'
+      let url = 'http://127.0.0.1:8000/api/v1/auth/login/'
       const formData = new FormData()
       formData.append('email', this.model.email)
       formData.append('password', this.model.password)
