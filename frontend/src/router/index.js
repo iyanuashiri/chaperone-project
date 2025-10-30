@@ -2,9 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import SignInView from '../views/SignInView.vue'
 import SignUpView from '../views/SignUpView.vue'
 import HomeView from '../views/HomeView.vue'
-// import DashboardView from '../views/Dashboard.vue'
 import GameListView from '../views/GameList.vue'
 import AssociationListView from '../views/AssociationList.vue'
+import UrlListView from '../views/UrlListView.vue'
+import UrlCreateView from '@/views/UrlCreateView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,11 +25,6 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
     },
-    // {
-    //   path: '/dashboard',
-    //   name: 'dashboard',
-    //   component: DashboardView,
-    // },
     {
       path: '/game-list',
       name: 'game-list',
@@ -39,16 +35,16 @@ const router = createRouter({
       name: 'association-list',
       component: AssociationListView,
     },
-    
-    
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (About.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/AboutView.vue'),
-    // },
+    {
+      path: '/url-list',
+      name: 'url-list',
+      component: UrlListView,
+    },
+    {
+      path: '/url-create',
+      name: 'url-create',
+      component: UrlCreateView,
+    }
   ],
 
   scrollBehavior(to, from, savedPosition) {

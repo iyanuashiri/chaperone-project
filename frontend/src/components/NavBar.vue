@@ -8,8 +8,8 @@
                 </a>
   
                 <ul class="space-y-2 font-medium">
-                    <!-- <NavBarItem content-name="Dashboard" url="dashboard"></NavBarItem> -->
                     <NavBarItem content-name="Games" url="game-list"></NavBarItem>
+                    <NavBarItem content-name="URLs" url="url-list"></NavBarItem>
                 </ul>
   
             </div>
@@ -26,6 +26,4 @@
       NavBarItem
     }
   }
-  
-  
   </script>
