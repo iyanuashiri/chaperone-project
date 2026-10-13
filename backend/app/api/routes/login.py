@@ -3,7 +3,7 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.security import manager, verify_hashed_password, OAuth2PasswordNewRequestForm
-from app import models
+from app.models import models
 from app.api.deps import SessionDep
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])

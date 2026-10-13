@@ -21,11 +21,15 @@ app = FastAPI(
 
 origins = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
+
+# Also allow extension origins (moz-extension://, chrome-extension://) and any
+# localhost dev port via allow_origin_regex below.
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origin_regex=r"^(https?://(localhost|127\.0\.0\.1)(:\d+)?|moz-extension://.*|chrome-extension://.*)$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

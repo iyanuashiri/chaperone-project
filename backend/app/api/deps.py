@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import manager
 from app.core.database import get_session
-from app import models
+from app.models import models
 
 
 @manager.user_loader()

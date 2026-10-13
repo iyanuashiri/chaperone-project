@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+﻿from fastapi import APIRouter, Depends, HTTPException, status
 
-from app import models, schemas
+from app.schemas import schemas
 from app.api.deps import manager, SessionDep
+from app.models import models
+from app.crud import (
+    create_vocabulary,
+    list_vocabularies,
+    get_vocabulary,
+)
 
 router = APIRouter(prefix="/vocabularies", tags=["Vocabularies"])
-
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.VocabularyRead)
@@ -14,11 +19,7 @@ async def create_vocabulary(vocab: schemas.VocabularyCreate, session: SessionDep
     if not current_user.is_active:
         raise HTTPException(status_code=403, detail="Inactive user")
 
-    db_vocab = models.Vocabulary(word=vocab.word, meaning=vocab.meaning)
-    session.add(db_vocab)
-    session.commit()
-    session.refresh(db_vocab)
-    return db_vocab
+    return create_vocabulary(session, vocab)
 
 
 @router.get("/", response_model=list[schemas.VocabularyRead])
@@ -27,8 +28,7 @@ async def get_vocabularies(session: SessionDep, current_user: models.User = Depe
         raise HTTPException(status_code=401, detail="Not authenticated")
     if not current_user.is_active:
         raise HTTPException(status_code=403, detail="Inactive user")
-    vocabularies = session.query(models.Vocabulary).all()
-    return vocabularies
+    return list_vocabularies(session)
 
 
 @router.get("/{vocab_id}/", response_model=schemas.VocabularyRead)
@@ -37,8 +37,8 @@ async def get_vocabulary_by_id(vocab_id: int, session: SessionDep, current_user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     if not current_user.is_active:
         raise HTTPException(status_code=403, detail="Inactive user")
-        
-    vocab = session.get(models.Vocabulary, vocab_id)
+
+    vocab = get_vocabulary(session, vocab_id)
     if not vocab:
         raise HTTPException(status_code=404, detail="Vocabulary not found")
     return vocab

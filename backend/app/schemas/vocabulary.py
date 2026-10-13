@@ -1,31 +1,16 @@
 from typing import Dict, List
-from datetime import datetime
 
 from pydantic import BaseModel, Field
-from app.models import AssociationStatus
 
-
-
-class UserBase(BaseModel):
-    first_name: str
-    last_name: str
-    email: str
-    
-
-class UserCreate(UserBase):
-    password: str
-
-
-class UserRead(UserBase):
-    id: int
-
-    class Config:
-        from_attributes = True
+from app.models.vocabulary import AssociationStatus
+from app.schemas.user import UserBase
+from app.schemas.user import UserBase
 
 
 class VocabularyCreate(BaseModel):
     word: str
     meaning: str
+
 
 class VocabularyRead(BaseModel):
     id: int
@@ -65,15 +50,3 @@ class AssociationRead(BaseModel):
 class AssociationSchema(BaseModel):
     vocabulary: str
     options: Dict[str, str] = Field(description="This is a dictionary of options. The key is the option and the value is the meaning.")
-
-
-class URLCreate(BaseModel):
-    url: str
-    
-
-class URLRead(BaseModel):
-    id: int
-    url: str
-    title: str
-    description: str
-    date_added: datetime
