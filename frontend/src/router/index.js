@@ -6,6 +6,11 @@ import GameListView from '../views/GameList.vue'
 import AssociationListView from '../views/AssociationList.vue'
 import UrlListView from '../views/UrlListView.vue'
 import UrlCreateView from '@/views/UrlCreateView.vue'
+import QuizListView from '@/views/QuizListView.vue'
+import QuizPlayView from '@/views/QuizPlayView.vue'
+import QuizCreateView from '@/views/QuizCreateView.vue'
+import GamePlayView from '@/views/GamePlayView.vue'
+import AnalyticsView from '@/views/AnalyticsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +36,16 @@ const router = createRouter({
       component: GameListView,
     },
     {
+      path: '/game-play',
+      name: 'game-play',
+      component: GamePlayView,
+    },
+    {
+      path: '/analytics',
+      name: 'analytics',
+      component: AnalyticsView,
+    },
+    {
       path: '/association-list',
       name: 'association-list',
       component: AssociationListView,
@@ -44,7 +59,26 @@ const router = createRouter({
       path: '/url-create',
       name: 'url-create',
       component: UrlCreateView,
+    },
+    {
+      path: '/quiz/:id',
+      name: 'quiz-play',
+      component: QuizPlayView,
+      props: true
+    },
+    {
+      path: '/quiz-list/',
+      name: 'quiz-list',
+      component: QuizListView,
+      // props: true
+    },
+    {
+      path: '/quiz-create/',
+      name: 'quiz-create',
+      component: QuizCreateView,
+
     }
+
   ],
 
   scrollBehavior(to, from, savedPosition) {

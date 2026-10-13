@@ -24,9 +24,9 @@ export default {
       games: [
         {
           id: 1,
-          title: 'Association',
-          description: 'Test your vocabulary by associating words. A fun way to learn new terms!',
-          path: '/association-list' 
+          title: 'Speed Bump',
+          description: 'Adaptive math & logic challenges that adjust to your accuracy. Play the speed-bump game from the extension!',
+          path: '/game-play'
         },
         {
           id: 2,

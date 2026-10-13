@@ -9,7 +9,9 @@
   
                 <ul class="space-y-2 font-medium">
                     <NavBarItem content-name="Games" url="game-list"></NavBarItem>
+                    <NavBarItem content-name="Quizzes" url="quiz-list"></NavBarItem>
                     <NavBarItem content-name="URLs" url="url-list"></NavBarItem>
+                    <NavBarItem content-name="Analytics" url="analytics"></NavBarItem>
                 </ul>
   
             </div>

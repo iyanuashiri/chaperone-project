@@ -42,4 +42,38 @@ export default {
   deleteUrl(id){
     return this.execute('delete', `/urls/${id}/`)
   },
+  getQuizzes(){
+    return this.execute('get', '/quizzes/')
+  },
+  createQuiz(quiz){
+    return this.execute('post', '/quizzes/', quiz)
+  },
+  getQuiz(id){
+    return this.execute('get', `/quizzes/${id}/`)
+  },
+  selectQuizOption(quizId, questionId, optionId) {
+    return this.execute('post', `/quizzes/${quizId}/questions/${questionId}/select`, { option_id: optionId });
+  },
+
+  // --- Adaptive speed-bump game (math/logic) ---
+  getChallenge(challengeType = 'math') {
+    return this.execute('get', `/game/challenge/?challenge_type=${challengeType}`)
+  },
+  startGameSession(siteUrl = '') {
+    return this.execute('post', '/game/session/', { source: 'frontend', site_url: siteUrl })
+  },
+  submitGameAnswer(sessionId, payload) {
+    return this.execute('post', `/game/session/${sessionId}/answer/`, payload)
+  },
+
+  // --- Analytics ---
+  getStatsSummary() {
+    return this.execute('get', '/stats/summary')
+  },
+  getDailyStats(days = 30) {
+    return this.execute('get', `/stats/daily?days=${days}`)
+  },
+  getSiteStats() {
+    return this.execute('get', '/stats/sites')
+  }
 }
