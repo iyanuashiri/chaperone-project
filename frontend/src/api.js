@@ -42,6 +42,15 @@ export default {
   deleteUrl(id){
     return this.execute('delete', `/urls/${id}/`)
   },
+  getMe() {
+    return this.execute('get', '/users/me')
+  },
+  updateMeSettings(timeLimitSeconds, challengeMode) {
+    return this.execute('put', '/users/me/settings', {
+      time_limit_seconds: timeLimitSeconds,
+      challenge_mode: challengeMode,
+    })
+  },
   getQuizzes(){
     return this.execute('get', '/quizzes/')
   },
@@ -56,8 +65,9 @@ export default {
   },
 
   // --- Adaptive speed-bump game (math/logic) ---
-  getChallenge(challengeType = 'math') {
-    return this.execute('get', `/game/challenge/?challenge_type=${challengeType}`)
+  getChallenge(challengeType) {
+    const query = challengeType ? `?challenge_type=${encodeURIComponent(challengeType)}` : ''
+    return this.execute('get', `/game/challenge/${query}`)
   },
   startGameSession(siteUrl = '') {
     return this.execute('post', '/game/session/', { source: 'frontend', site_url: siteUrl })

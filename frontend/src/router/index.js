@@ -3,14 +3,9 @@ import SignInView from '../views/SignInView.vue'
 import SignUpView from '../views/SignUpView.vue'
 import HomeView from '../views/HomeView.vue'
 import GameListView from '../views/GameList.vue'
-import AssociationListView from '../views/AssociationList.vue'
-import UrlListView from '../views/UrlListView.vue'
-import UrlCreateView from '@/views/UrlCreateView.vue'
-import QuizListView from '@/views/QuizListView.vue'
-import QuizPlayView from '@/views/QuizPlayView.vue'
-import QuizCreateView from '@/views/QuizCreateView.vue'
 import GamePlayView from '@/views/GamePlayView.vue'
 import AnalyticsView from '@/views/AnalyticsView.vue'
+import SettingsView from '@/views/SettingsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,39 +41,10 @@ const router = createRouter({
       component: AnalyticsView,
     },
     {
-      path: '/association-list',
-      name: 'association-list',
-      component: AssociationListView,
+      path: '/settings',
+      name: 'settings',
+      component: SettingsView,
     },
-    {
-      path: '/url-list',
-      name: 'url-list',
-      component: UrlListView,
-    },
-    {
-      path: '/url-create',
-      name: 'url-create',
-      component: UrlCreateView,
-    },
-    {
-      path: '/quiz/:id',
-      name: 'quiz-play',
-      component: QuizPlayView,
-      props: true
-    },
-    {
-      path: '/quiz-list/',
-      name: 'quiz-list',
-      component: QuizListView,
-      // props: true
-    },
-    {
-      path: '/quiz-create/',
-      name: 'quiz-create',
-      component: QuizCreateView,
-
-    }
-
   ],
 
   scrollBehavior(to, from, savedPosition) {
