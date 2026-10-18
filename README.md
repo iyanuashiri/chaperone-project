@@ -5,6 +5,15 @@
 
 Chaperone is a browser extension (available for both Chrome and Firefox) designed to help you manage your time on social media and promote healthier digital habits. It's based on the concept of **adaptive speed bumps** — gamified cognitive challenges that interrupt habitual, passive scrolling. After a user-defined time limit on specified websites, Chaperone presents a brief puzzle. Solving the puzzle allows you to postpone the time limit and earn points, while failing to solve it (or choosing not to) encourages you to close the tab. The design is grounded in behavioral theory (habit loops, cognitive friction, gamification) and detailed in a peer-reviewed workshop paper at ACM UbiComp.
 
+## Demo Video
+
+
+<!-- ![](reduce_social_media.gif) -->
+
+
+![](chaperone-demo.gif)
+
+
 ## Table of Contents
 
 - [Chaperone: A Browser Extension for Mindful Social Media Use](#chaperone-a-browser-extension-for-mindful-social-media-use)
@@ -84,7 +93,7 @@ The paper describes a functional prototype demonstrating the feasibility of the 
 
 *   **Customizable Time Limits:** Set the maximum browsing time (in minutes) for restricted websites.
 *   **Website Blocking/Restriction:**  Define a list of websites to which the time limit applies.  Supports wildcard patterns (e.g., `*://*.twitter.com/*`).
-*   **Adaptive Speed-Bump Challenge:**  Instead of a fixed arithmetic problem, the extension fetches an **adaptive challenge** from the backend (`GET /game/challenge`). The difficulty rises with your accuracy and falls with misses — matching the adaptive speed-bump concept from the UbiComp workshop paper. Math and logic challenges are generated deterministically server-side (no LLM required).
+*   **Adaptive Speed-Bump Challenge:** Choose math or synonym challenges in your account settings. Math challenges are generated deterministically; synonym challenges are generated on demand by Amazon Bedrock on the backend. Challenge difficulty adapts to your accuracy, and the same preference is used in the web app and browser extension.
 *   **Postponement Options:**  After successfully completing the challenge, choose from pre-defined postponement durations (1, 2, 5, 10 minutes) or enter a custom duration.
 *   **Close Tab Option:**  Users can choose to close the restricted tab instead of solving the challenge or postponing.
 *   **Backend Analytics Sync:**  Each speed-bump session is recorded server-side (`POST /game/session`, `POST /game/session/{id}/answer`), so accuracy, streaks, and points feed the dashboard.
@@ -94,42 +103,29 @@ The paper describes a functional prototype demonstrating the feasibility of the 
 
 ## Installation
 
-> **Not yet published to the Chrome Web Store or Firefox Add-ons.** The links below go live once publishedaroout3000.
-
-### From the Store (once published)
-
-#### Chrome
-
-1.  **Download:** [Link to Chrome Web Store listing ]  (Not yet published)
-2.  **Install:** Click "Add to Chrome".
-
-#### Firefox
-
-1.  **Download:** [Link to Firefox Add-ons listing - ] (Not yet published)
-2.  **Install:** Click "Add to Firefox".
-
-### Loading the Prebuilt Build
-
-Ready-made extension packages live in the `browser-extension/` directory:
+Download the prebuilt extension for your browser and load it manually. The extensions are not yet listed in the Chrome Web Store or Firefox Add-ons.
 
 | File | Target | Type |
 |------|--------|------|
-| `browser-extension/chaperone-chrome.zip` | Chrome | MV3 (service worker, `action`) |
-| `browser-extension/chaperone-firefox.zip` | Firefox | MV2 (`browser_action`, browser_specific_settings) |
-| `browser-extension/dist/` | both | unpacked build output |
+| [chaperone-chrome.zip](browser-extension/chaperone-chrome.zip) | Chrome | MV3 (service worker, `action`) |
+| [chaperone-firefox.zip](browser-extension/chaperone-firefox.zip) | Firefox | MV2 (`browser_action`, `browser_specific_settings`) |
 
 **Chrome (load unpacked):**
 
-1.  Unzip `chaperone-chrome.zip` (or use the ready `dist/`).
-2.  Open Chrome → `chrome://extensions/`.
-3.  Enable **Developer mode** (top right).
-4.  Click **"Load unpacked"** and select the folder containing `manifest.json`.
+1. Download [chaperone-chrome.zip](browser-extension/chaperone-chrome.zip) and extract the ZIP file.
+2. In Chrome, open `chrome://extensions/` and turn on **Developer mode**.
+3. Click **Load unpacked**.
+4. Select the extracted Chaperone folder containing `manifest.json`.
 
 **Firefox (temporary add-on):**
 
-1.  Unzip `chaperone-firefox.zip` (or use the ready `dist/`).
-2.  Open Firefox → `about:debugging` → **This Firefox**.
-3.  Click **"Load Temporary Add-on…"** and select the `manifest.json`.
+1. Download [chaperone-firefox.zip](browser-extension/chaperone-firefox.zip) and extract the ZIP file.
+2. In Firefox, open `about:debugging#/runtime/this-firefox`.
+3. Click **Load Temporary Add-on…**.
+4. Open the extracted Chaperone folder and select `manifest.json`.
+5. Load the add-on again after closing and reopening Firefox; temporary add-ons do not persist across browser restarts.
+
+After installation, create an account or sign in to use Chaperone.
 
 ### Building from Source (Vue + Vite)
 
@@ -155,7 +151,9 @@ $env:TARGET = "chrome"; npm run build
 # --- Load / test ---
 # Firefox:  npx web-ext run --source-dir dist           (or npm run dev to launch)
 # Chrome:   npx web-ext run --source-dir dist --target chromium  (looks for source-dir manifest)
-# Validate: npx web-ext lint --source-dir dist  [TARGET=... same as build]
+# Validate the Firefox build with Mozilla's extension linter:
+#   npx web-ext lint --source-dir dist
+# Validate the Chrome build by loading dist/ unpacked at chrome://extensions/.
 ```
 
 Loading conventions are the same as above — Chrome via `chrome://extensions` → Load unpacked, Firefox via `about:debugging` → Load Temporary Add-on. In Firefox, run `npm run dev` and pick `chaperone-firefox.zip` / the `browser-extension` source; `web-ext` handles the temporary-install + live-reload cycle.
@@ -170,21 +168,23 @@ Loading conventions are the same as above — Chrome via `chrome://extensions` �
 
 2.  **Set the Time Limit:**  Enter the desired time limit (in minutes) in the "Time Limit" input field.
 
-3.  **Add Restricted Websites:**
+3.  **Choose a Challenge:** Select Math or AI-generated Synonym in the Chaperone account settings. The same choice is used for web-app practice and browser-extension pauses.
+
+4.  **Add Restricted Websites:**
     *   Enter the URL of the website you want to restrict in the "Enter website URL" input field.  You can use a simplified format (e.g., `twitter.com`, `facebook.com`). The extension automatically converts this to a wildcard pattern (e.g., `*://*.twitter.com/*`).
     *   Click "Add URL".
     *   To remove a URL, click the "Remove" button next to it.
 
-4.  **Save Changes:** Click the "Save Changes" button.  A success message will appear briefly.
+5.  **Save Changes:** Click the "Save Changes" button. A success message will appear briefly.
 
-5.  **Browsing:** When you visit a restricted website, a timer starts.  Once the time limit is reached, a modal window will appear with a math challenge.
+6.  **Browsing:** When you visit a restricted website, a timer starts. Once the time limit is reached, a modal window will show your selected challenge.
 
-6.  **Challenge Interaction:**
-    *   **Solve:** Pick the correct answer to proceed to the postponement options. The challenge is fetched live from the backend (`/game/challenge`) and adapts to your accuracy.
+7.  **Challenge Interaction:**
+    *   **Solve:** Pick the correct answer to proceed to the postponement options. Synonym challenges are generated live by the backend; no static synonym list is used.
     *   **Incorrect Answer:** An error message will be displayed.  You can try again.
     *   **Close Tab:** Click "Close Tab" to close the current tab.
 
-7.  **Postponement:**
+8.  **Postponement:**
     *   **Quick Options:** Click one of the pre-defined postponement buttons (1, 2, 5, 10 minutes).
     *   **Custom Time:** Enter a custom duration (in minutes) and click "Set".
     *   **Close Tab:** Click "Close Tab" to close the current tab.
@@ -198,10 +198,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 
 
-## Demo Video
 
 
-<!-- ![](reduce_social_media.gif) -->
+## Star History
 
-
-![](chaperone-demo.gif)
+<a href="https://www.star-history.com/?repos=iyanuashiri%2Fchaperone-project&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=iyanuashiri/chaperone-project&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=iyanuashiri/chaperone-project&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=iyanuashiri/chaperone-project&type=date&legend=top-left" />
+ </picture>
+</a>
